@@ -1,6 +1,6 @@
 # Absolutus Rex
 
-**absolutus_rex** is a CLI tool to forward ports. The name means "absolute king" in Latin. It is currently on version 0.1.0.
+**absolutus_rex** is a CLI tool to forward ports. The name means "Absolute King" in Latin. It is currently on version 0.1.0.
 
 ## Usage
 
