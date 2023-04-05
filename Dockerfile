@@ -2,4 +2,4 @@ FROM alpine:latest
 
 COPY absolutus_rex /usr/local/bin/
 
-CMD ["absolutus_rex","--help"]
+CMD ["chmod","a+x","/usr/local/bin/absolutus_rex"]
