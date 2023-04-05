@@ -10,6 +10,23 @@ To use **absolutus_rex**, run the following command:
 absolutus_rex [OPTIONS] --r-address <REMOTE_ADDRESS> --r-port <REMOTE_PORT>
 ```
 
+```mermaid
+sequenceDiagram
+    actor  client
+    participant Rex
+    participant server
+    client->>Rex: Send packet
+    activate Rex
+    Rex->>server: Forward packet
+    activate server
+    server-->>Rex: Send response
+    deactivate server
+    Rex-->>client: Send response
+    deactivate Rex
+    Note right of Rex: Tunneled Connection
+
+```
+
 ### Options
 
 - `-p, --port <PORT>`: Local port - requires a local port that is available for use [default: 8990]
