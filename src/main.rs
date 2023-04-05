@@ -1,9 +1,6 @@
 use absolutus_rex::TcpProxy;
 use clap::Parser;
-use std::{
-    fmt::{self},
-    io::{self, Write},
-};
+use std::fmt;
 
 #[derive(Parser, Debug)]
 #[command(
@@ -35,7 +32,7 @@ fn main() {
     println!("\tPort: `{}`", args.port);
     println!("\tIs Local Only: {}!", args.local_only);
     println!("\tRemote Address: `{}`", remote);
-    match TcpProxy::new(args.port, remote.parse().unwrap(), args.local_only == false) {
+    match TcpProxy::new(args.port, remote.parse().unwrap(), args.local_only) {
         Ok(_proxy) => {
             println!("Proxy State: OK!");
         }
@@ -44,12 +41,6 @@ fn main() {
             println!("Reason: {}", e.err().unwrap());
         }
     }
-    let result = io::stdout().flush();
-    if {
-        let ref this = result;
-        matches!(*this, Ok(_))
-    } {
-        print!("Flushed");
-    }
-    loop {}
+
+    std::thread::park();
 }
