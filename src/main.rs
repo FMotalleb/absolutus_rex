@@ -1,7 +1,7 @@
 use absolutus_rex::TcpProxy;
 use clap::Parser;
+use log::{debug, error, set_max_level, LevelFilter};
 use std::fmt;
-
 #[derive(Parser, Debug)]
 #[command(
     author,
@@ -26,11 +26,18 @@ struct Args {
     remote_port: u16,
 }
 fn main() {
+    pretty_env_logger::init_custom_env("LOG_LEVEL");
+    let level = match std::env::var("LOG_LEVEL") {
+        Ok(value) => value,
+        _ => "error".into(),
+    };
+
     let args = Args::parse();
     let remote = fmt::format(format_args!("{}:{}", args.remote_address, args.remote_port));
     println!("Application ran with config:");
     println!("\tIs Local Only: {}!", args.local_only);
     println!("\tRemote Address: `{}`", remote);
+    println!("\tLOG_LEVEL: {}", level);
     for port in args.ports {
         match TcpProxy::new(port, remote.parse().unwrap(), args.local_only) {
             Ok(_proxy) => {
