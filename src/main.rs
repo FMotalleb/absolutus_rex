@@ -10,9 +10,9 @@ use std::fmt;
     long_about = "Absolutus Rex is a command-line tool for port forwarding.\n\nThis tool can be used to forward ports, and may be particularly useful when used with `supervisord`."
 )]
 struct Args {
-    /// Local port - requires a local port that is available for use.
-    #[arg(short, long, default_value_t = 8990)]
-    port: u16,
+    /// Local ports - requires local ports that are available for use.
+    #[arg(short, long)]
+    ports: Vec<u16>,
 
     /// This flag only opens a port on the local network (127.0.0.1), and is intended for debugging purposes.
     #[arg(short, long, default_value_t = false)]
@@ -29,16 +29,17 @@ fn main() {
     let args = Args::parse();
     let remote = fmt::format(format_args!("{}:{}", args.remote_address, args.remote_port));
     println!("Application ran with config:");
-    println!("\tPort: `{}`", args.port);
     println!("\tIs Local Only: {}!", args.local_only);
     println!("\tRemote Address: `{}`", remote);
-    match TcpProxy::new(args.port, remote.parse().unwrap(), args.local_only) {
-        Ok(_proxy) => {
-            println!("Proxy State: OK!");
-        }
-        e => {
-            println!("Proxy State: ERROR!");
-            println!("Reason: {}", e.err().unwrap());
+    for port in args.ports {
+        match TcpProxy::new(port, remote.parse().unwrap(), args.local_only) {
+            Ok(_proxy) => {
+                println!("\tPort: {},Proxy State: OK!", port);
+            }
+            e => {
+                println!("Port: {},Proxy State: ERROR!", port);
+                println!("Reason: {}", e.err().unwrap());
+            }
         }
     }
 

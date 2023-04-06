@@ -1,6 +1,6 @@
 # Absolutus Rex
 
-**absolutus_rex** is a CLI tool to forward ports. The name means "Absolute King" in Latin. It is currently on version 0.1.0.
+**absolutus_rex** is a CLI tool to forward ports. The name means "Absolute King" in Latin. It is currently on version 0.2.0.
 
 ## Usage
 
@@ -29,14 +29,14 @@ sequenceDiagram
 
 ### Options
 
-- `-p, --port <PORT>`: Local port - requires a local port that is available for use [default: 8990]
+- `-p, --ports <PORTS>`: Local port - requires a local port that are available for use
 - `-l, --local-only`: This flag only opens a port on the local network (127.0.0.1), and is intended for debugging purposes
 - `-a, --r-address <REMOTE_ADDRESS>`: This flag sets the remote address
 - `--r-port <REMOTE_PORT>`: This flag sets the remote port
 - `-h, --help`: Print help (see more with '--help')
 - `-V, --version`: Print version
 
-Note: The `--r-address` and `--r-port` options are required.
+Note: The `--r-address`, `--r-port` and `--ports` options are required.
 
 ## Installation
 
