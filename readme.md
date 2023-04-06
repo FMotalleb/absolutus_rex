@@ -50,3 +50,11 @@ To install **absolutus_rex**, follow these steps:
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## TODO
+
+- [ ] config file
+- [ ] deamonize (after config file)
+- [ ] dns server
+- [ ] ipv6 support
+- [ ] multiple remote server
