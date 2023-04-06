@@ -1,6 +1,5 @@
 use absolutus_rex::TcpProxy;
 use clap::Parser;
-use log::{debug, error, set_max_level, LevelFilter};
 use std::fmt;
 #[derive(Parser, Debug)]
 #[command(
