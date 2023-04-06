@@ -5,8 +5,8 @@ use std::fmt;
 #[command(
     author,
     version,
-    about,
-    long_about = "Absolutus Rex is a command-line tool for port forwarding.\n\nThis tool can be used to forward ports, and may be particularly useful when used with `supervisord`."
+    about = "Absolutus Rex is a command-line tool for port forwarding.",
+    long_about = None
 )]
 struct Args {
     /// Local ports - requires local ports that are available for use.
