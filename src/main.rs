@@ -34,20 +34,24 @@ fn main() {
 
     let args = Args::parse();
     let remote = fmt::format(format_args!("{}:{}", args.remote_address, args.remote_port));
+
     println!("Application ran with config:");
     println!("\tIs Local Only: {}!", args.local_only);
     println!("\tRemote Address: `{}`", remote);
     println!("\tLOG_LEVEL: {}", level);
     for port in args.ports {
-        match TcpProxy::new(port, remote.parse().unwrap(), args.local_only) {
-            Ok(_proxy) => {
-                println!("\tPort: {},Proxy State: OK!", port);
+        let remote_address = remote.clone();
+        std::thread::spawn(move || {
+            match TcpProxy::new(port, remote_address.parse().unwrap(), args.local_only) {
+                Ok(_proxy) => {
+                    println!("\tPort: {},Proxy State: OK!", port);
+                }
+                e => {
+                    println!("Port: {},Proxy State: ERROR!", port);
+                    println!("Reason: {}", e.err().unwrap());
+                }
             }
-            e => {
-                println!("Port: {},Proxy State: ERROR!", port);
-                println!("Reason: {}", e.err().unwrap());
-            }
-        }
+        });
     }
 
     std::thread::park();
