@@ -29,7 +29,7 @@ sequenceDiagram
 
 ### Options
 
-- `-p, --ports <PORTS>`: Local port - requires a local port that are available for use
+- `-p, --ports <PORTS>`: Local port|s - requires a local port|s that are available for use
 - `-l, --local-only`: This flag only opens a port on the local network (127.0.0.1), and is intended for debugging purposes
 - `-a, --r-address <REMOTE_ADDRESS>`: This flag sets the remote address
 - `--r-port <REMOTE_PORT>`: This flag sets the remote port
