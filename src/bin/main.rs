@@ -1,4 +1,4 @@
-use absolutus_rex::TcpProxy;
+use absolutus_rex::tcp_proxy::TcpProxy;
 use clap::Parser;
 use log::{error, info};
 use std::{fmt, thread::Builder};
