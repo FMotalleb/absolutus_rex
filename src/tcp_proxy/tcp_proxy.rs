@@ -1,7 +1,7 @@
 use log::{debug, error};
 use std::fmt;
 use std::io::{BufRead, BufReader, Write};
-use std::net::{IpAddr, Ipv4Addr, SocketAddr, TcpListener, TcpStream};
+use std::net::{IpAddr, Ipv4Addr,Ipv6Addr, SocketAddr, TcpListener, TcpStream};
 pub struct TcpProxy {
     pub forward_thread: std::thread::JoinHandle<()>,
 }
@@ -11,20 +11,29 @@ impl TcpProxy {
         listen_port: u16,
         proxy_to: SocketAddr,
         local_only: bool,
+        use_ipv6:bool,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        let ip = if local_only {
-            Ipv4Addr::LOCALHOST
-        } else {
-            Ipv4Addr::UNSPECIFIED
-        };
-        let listener_forward = TcpListener::bind(SocketAddr::new(IpAddr::V4(ip), listen_port))?;
+        let ip:IpAddr;
+        if use_ipv6 {
+            if local_only {
+                ip=IpAddr::V6(Ipv6Addr::LOCALHOST);
+            }else{
+                 ip=IpAddr::V6(Ipv6Addr::UNSPECIFIED);
+            }
+        }else if local_only {
+            ip=IpAddr::V4(Ipv4Addr::LOCALHOST);
+        }else{
+             ip=IpAddr::V4(Ipv4Addr::UNSPECIFIED);
+        }
+
+        let listener_forward = TcpListener::bind(SocketAddr::new(ip, listen_port))?;
         let name = fmt::format(format_args!("Listener thread of port:{}", listen_port,));
         let forward_thread = match std::thread::Builder::new().name(name).spawn(move || {
             loop {
                 let (stream_forward, _addr) = listener_forward
                     .accept()
                     .expect("Failed to accept connection");
-                debug!("New connection");
+                debug!("New connection,ip: {}",_addr.ip());
 
                 let mut sender_forward = TcpStream::connect(proxy_to).expect("Failed to bind");
                 let sender_backward = sender_forward.try_clone().expect("Failed to clone stream");
@@ -60,8 +69,7 @@ impl TcpProxy {
                     }
                 };
                 let name = fmt::format(format_args!("Backward Stream of port:{}", listen_port,));
-                let _backward_thread =
-                    match std::thread::Builder::new().name(name).spawn(move || {
+                match std::thread::Builder::new().name(name).spawn(move || {
                         let mut sender_backward = BufReader::new(sender_backward);
                         loop {
                             let length = {
