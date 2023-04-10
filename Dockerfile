@@ -1,5 +1,5 @@
 FROM alpine:latest
 
-COPY rex /usr/local/bin/
+COPY absolutus_rex /usr/local/bin/
 
-CMD ["chmod","a+x","/usr/local/bin/rex"]
+CMD ["chmod","a+x","/usr/local/bin/absolutus_rex"]
