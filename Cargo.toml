@@ -9,3 +9,5 @@ edition = "2021"
 clap = { version = "4.2.1", features = ["derive"] }
 env_logger = "0.10.0"
 log = "0.4.17"
+
+[Target.x86_64-unknown-linux-musl]
