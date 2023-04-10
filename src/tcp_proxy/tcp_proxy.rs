@@ -2,6 +2,7 @@ use log::{debug, error};
 use std::io::{BufRead, BufReader, Write};
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, TcpListener, TcpStream};
 use std::{fmt, panic};
+
 pub struct TcpProxy {
     pub forward_thread: std::thread::JoinHandle<()>,
 }
@@ -72,10 +73,18 @@ fn connection_handler(proxy_to: SocketAddr, stream_forward: TcpStream, listen_po
                     return;
                 }
 
-                sender_forward
-                    .write_all(buffer)
-                    .expect("Failed to write to remote");
-                sender_forward.flush().expect("Failed to flush remote");
+                match sender_forward.write_all(buffer) {
+                    Ok(_) => {}
+                    Err(e) => {
+                        error!("sender forwarder crashed:{}", e)
+                    }
+                };
+                match sender_forward.flush() {
+                    Ok(_) => {}
+                    Err(e) => {
+                        error!("sender forwarder stream flush crashed:{}", e)
+                    }
+                };
                 length
             };
             stream_forward.consume(length);
