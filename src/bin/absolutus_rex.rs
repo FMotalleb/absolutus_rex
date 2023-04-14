@@ -1,6 +1,6 @@
 use absolutus_rex::tcp_proxy::TcpProxy;
 use clap::Parser;
-use log::{error, info};
+use log::{error, info, LevelFilter};
 use std::{fmt, thread::Builder};
 
 #[derive(Parser, Debug)]
@@ -20,36 +20,30 @@ struct Args {
     #[arg(short, long, default_value_t = false)]
     local_only: bool,
 
-    /// This flag only opens a port on the local network (127.0.0.1), and is intended for debugging purposes.
+    /// Remote server's ip address
     #[arg(short = 'a', long = "r-address")]
     remote_address: String,
-    /// This flag only opens a port on the local network (127.0.0.1), and is intended for debugging purposes.
+    /// Remote server's port
     #[arg(long = "r-port")]
     remote_port: u16,
-    /// LogLevel
-    #[arg(long)]
-    log_level: Option<String>,
+    /// This flag only opens a port on the local network (127.0.0.1), and is intended for debugging purposes.
+    #[arg(long = "v6", default_value_t = false)]
+    use_ip_v6: bool,
+    /// LogLevel - Options: info(default),warn,debug,off
+    #[arg(long,default_value_t=String::from("info"))]
+    log_level: String,
 }
 fn main() {
     let args = Args::parse();
+    let log_level = parse_log_level(args.log_level);
 
-    let log_level = args.log_level.unwrap_or("info".to_string());
-    let log_level = parse_log_level(log_level);
-
-    env_logger::Builder::from_env(
-        env_logger::Env::new()
-            .filter("LOG_LEVEL")
-            .default_filter_or(log_level.clone()),
-    )
-    // .format(formatter)
-    .format_timestamp_secs()
-    .format_target(false)
-    .format_indent(Option::Some(8))
-    .init();
-    let level = match std::env::var("LOG_LEVEL") {
-        Ok(value) => value,
-        _ => log_level,
-    };
+    env_logger::Builder::new()
+        .filter(Option::None, log_level)
+        .format_timestamp_secs()
+        .format_target(false)
+        .format_indent(Option::Some(8))
+        .init();
+    let level = log_level.as_str();
 
     let remote = fmt::format(format_args!("{}:{}", args.remote_address, args.remote_port));
 
@@ -62,12 +56,11 @@ fn main() {
         let remote_address = remote.clone().parse().unwrap();
         let name = fmt::format(format_args!("Thread Spawner of:{}", remote,));
         match Builder::new().name(name).spawn(move || {
-            match TcpProxy::new(port, remote_address, args.local_only) {
+            match TcpProxy::new(port, remote_address, args.local_only, args.use_ip_v6) {
                 Ok(_proxy) => {
                     info!("\tPort: {},Proxy State: OK!", port);
                 }
                 Err(e) => {
-                    // error!("Port: {},Proxy State: ERROR!", port);
                     error!("Port: {},Reason: {}", port, e);
                 }
             }
@@ -82,11 +75,23 @@ fn main() {
     std::thread::park();
 }
 
-fn parse_log_level(arg: String) -> String {
-    let arg = arg.to_string();
-    if arg == "error" || arg == "debug" || arg == "info" {
-        return arg;
+fn parse_log_level(arg: String) -> LevelFilter {
+    let arg = arg;
+    if arg == "error" {
+        return LevelFilter::Error;
+    } else if arg == "debug" {
+        return LevelFilter::Debug;
+    } else if arg == "info" {
+        return LevelFilter::Info;
+    } else if arg == "trace" {
+        return LevelFilter::Trace;
+    } else if arg == "off" {
+        return LevelFilter::Off;
+    } else if arg == "warn" {
+        return LevelFilter::Warn;
     }
     println!("debug level is invalid using `error` instead.");
-    return "error".to_string();
+    LevelFilter::Error
+    // println!("debug level is invalid using `error` instead.");
+    // "error".to_string()
 }
